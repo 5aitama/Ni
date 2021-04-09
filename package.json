@@ -6,7 +6,8 @@
   "author": "5aitama ❤️",
   "license": "MIT",
   "scripts": {
-    "dev": "snowpack dev"
+    "dev": "snowpack dev",
+    "build": "tsc"
   },
   "devDependencies": {
     "@snowpack/plugin-typescript": "^1.2.1",
