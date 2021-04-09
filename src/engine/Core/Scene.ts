@@ -11,6 +11,9 @@ const fpsLabel = document.querySelector('#fps_label') as HTMLParagraphElement;
 export default class Scene {
     canvas: HTMLCanvasElement;
     gl: WebGLRenderingContext;
+    
+    buffers: Buffer[] = [];
+    materials: Material[] = [];
 
     vbuffer : Buffer | null = null;
     tbuffer : Buffer | null = null;
@@ -103,6 +106,17 @@ export default class Scene {
 
     onTest(time: number = 0) {
         requestAnimationFrame((time) => this.onTest(time));
+
+        // Update buffers...
+        for(const buff of this.buffers)
+            Buffer.updateBuffer(this.gl, buff, this.shader!);
+
+        // Update materials uniforms and attributes...
+        for(const mat of this.materials) {
+            mat.sendAttributes(this.gl);
+            mat.sendUniforms(this.gl);
+        }
+
         const delta = time - this.lastTime;
         this.lastTime = time;
 

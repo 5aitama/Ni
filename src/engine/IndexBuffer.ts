@@ -8,7 +8,7 @@ export default class IndexBuffer extends Buffer {
     /**
      * Create new index buffer.
      * @param indices The indices.
-     * @param isDynamic If the buffer will be modified repeatedly and used many times.
+     * @param isDynamic Must be `true` if the buffer will be modified repeatedly and used many times.
      */
     constructor(indices: number[], isDynamic = false) {
         super({ indices: new BufferData(indices, BufferDataType.byte, BufferAttributeAmount.one, false) },
