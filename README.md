@@ -38,6 +38,6 @@ npm run dev
 # Exemple
 
 ## Ray Marching
-Basic implementation of raymarching algorithm
+Basic implementation of [Ray Marching Algorithm](http://jamie-wong.com/2016/07/15/ray-marching-signed-distance-functions/)
 
 ![](./img/screenshot0.png)
