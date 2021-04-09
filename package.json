@@ -1,0 +1,16 @@
+{
+  "name": "ni-game-engine",
+  "version": "1.0.0",
+  "description": "Very little 2D game engine",
+  "main": "index.js",
+  "author": "5aitama ❤️",
+  "license": "MIT",
+  "scripts": {
+    "dev": "snowpack dev"
+  },
+  "devDependencies": {
+    "@snowpack/plugin-typescript": "^1.2.1",
+    "snowpack": "^3.2.2",
+    "typescript": "^4.2.3"
+  }
+}
