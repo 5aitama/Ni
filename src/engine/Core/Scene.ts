@@ -1,4 +1,13 @@
-import Buffer, { BufferAttributeAmount, BufferDataType, BufferTarget, BufferUsage } from "./Buffer";
+import IndexBuffer from "../IndexBuffer";
+import Number2 from "../Math/Number2";
+import Vertex2DBuffer from "../Vertex2DBuffer";
+import Buffer, { 
+    BufferUsage,
+    BufferTarget,
+    BufferAttributeSize,
+    BufferAttributeDataType,
+} from "./Buffer";
+
 import Material, { UniformType } from "./Material";
 import Shader from "./Shader";
 
@@ -60,26 +69,20 @@ export default class Scene {
             
             this.material.sendUniforms(this.gl);
             this.material.sendAttributes(this.gl);
-    
-            this.vbuffer = new Buffer({
-                aVertexPosition: { 
-                    data: [-1, -1, -1, 1, 1, 1, 1, -1,],
-                    type: BufferDataType.byte, 
-                    size: BufferAttributeAmount.two, 
-                    normalized: false 
-                },
-            }, BufferTarget.array, BufferUsage.static);
+            
+            this.vbuffer = new Vertex2DBuffer([
+                new Number2(-1, -1),
+                new Number2(-1,  1),
+                new Number2( 1,  1),
+                new Number2( 1, -1),
+            ], false);
     
             Buffer.updateBuffer(this.gl, this.vbuffer, this.shader);
-    
-            this.tbuffer = new Buffer({
-                indices: {
-                    data: [0, 1, 2, 0, 2, 3],
-                    type: BufferDataType.ubyte, 
-                    size: BufferAttributeAmount.one, 
-                    normalized: false 
-                },
-            }, BufferTarget.element, BufferUsage.static);
+            
+            this.tbuffer = new IndexBuffer([
+                0, 1, 2, 
+                0, 2, 3,
+            ], false);
     
             Buffer.updateBuffer(this.gl, this.tbuffer, this.shader);
             this.onResize(this.gl);
@@ -133,7 +136,7 @@ export default class Scene {
         this.material!.sendAttributes(this.gl);
         
         Buffer.bindBuffer(this.gl, this.tbuffer!);
-        this.gl.drawElements(this.gl.TRIANGLES, this.tbuffer!.data.indices.data.length, this.tbuffer!.data.indices.type, 0);
+        this.gl.drawElements(this.gl.TRIANGLES, this.tbuffer!.attributes.indices.data.length, this.tbuffer!.attributes.indices.type, 0);
 
         if(this.t_fps > 1000) {
             fpsLabel.innerText = this.fps.toString() + ' fps';

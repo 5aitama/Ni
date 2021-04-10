@@ -1,17 +1,18 @@
-import Buffer, { 
-    BufferAttributeAmount, 
-    BufferDataType, 
-    BufferTarget, 
+import {
     BufferUsage,
-    BufferData
+    BufferTarget,
+    BufferAttribute,
+    BufferAttributeSize,
+    BufferAttributeDataType,
 } from "./Core/Buffer";
 
 import Number2 from "./Math/Number2";
+import VertexBuffer from "./VertexBuffer";
 
 /**
  * Vertex 2D Buffer.
  */
-export default class Vertex2DBuffer extends Buffer {
+export default class Vertex2DBuffer extends VertexBuffer {
 
     /**
      * Create new vertex 2D buffer.
@@ -24,9 +25,7 @@ export default class Vertex2DBuffer extends Buffer {
         for(const n of data)
             array.push(n.x, n.y);
         
-        super({ indices: new BufferData(array, BufferDataType.short, BufferAttributeAmount.two, false) },
-            BufferTarget.element, isDynamic ? BufferUsage.dynamic : BufferUsage.static
-        );
+        super({ aVertexPosition: new BufferAttribute(array, BufferAttributeDataType.short, BufferAttributeSize.two, false) }, isDynamic);
     }
 
 }

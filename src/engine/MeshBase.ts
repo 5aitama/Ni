@@ -69,12 +69,12 @@ export default class MeshBase {
         }
 
         for(const k in attributes) {
-            if(!this.buffers[name].data[k]) {
+            if(!this.buffers[name].attributes[k]) {
                 console.warn(`Cannot update buffer attributes: A buffer attribute with name ${k} don't exist!`);
                 continue;
             }
 
-            this.buffers[name].data[k].data = attributes[k];
+            this.buffers[name].attributes[k].data = attributes[k];
         }
     }
 
@@ -88,7 +88,7 @@ export default class MeshBase {
      */
     public updateBufferAttributesUnsafe(name: string, attributes: {[name: string]: number[]}) {
         for(const k in attributes)
-            this.buffers[name].data[k].data = attributes[k];
+            this.buffers[name].attributes[k].data = attributes[k];
     }
 
     /**
@@ -104,7 +104,7 @@ export default class MeshBase {
             return;
         }
 
-        if(!this.buffers[buffer].data[attribute]) {
+        if(!this.buffers[buffer].attributes[attribute]) {
             console.warn(`Cannot update buffer attribute: A buffer attribute with name ${attribute} don't exist!`);
             return;
         }
@@ -122,7 +122,7 @@ export default class MeshBase {
      * @param data The new attribute data.
      */
     public updateBufferAttributeDataUnsafe(buffer: string, attribute: string, data: number[]) {
-        this.buffers[buffer].data[attribute].data = data;
+        this.buffers[buffer].attributes[attribute].data = data;
     }
 
     /**
