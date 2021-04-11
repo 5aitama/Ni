@@ -1,10 +1,11 @@
+import IMathComponent from "./IMathComponent";
 
 /**
  * Class that group two number together and allow you to
  * perform some operation on it. Usefull for things like
- * `2D Vector` representation.
+ * `2D Vector`.
  */
-export default class Number2 {
+export default class Number2 implements IMathComponent {
 
     x: number = 0;
     y: number = 0;
@@ -24,6 +25,10 @@ export default class Number2 {
             this.x = x;
             this.y = y;
         }
+    }
+
+    public rawData() {
+        return [this.x, this.y];
     }
 
     /**
