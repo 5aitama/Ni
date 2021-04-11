@@ -104,4 +104,43 @@ export default class Number3 implements IMathComponent {
 
         return this;
     }
+
+    /**
+     * Perform a basic division on each property.
+     * 
+     * @param xyz A `number` or `Number2` or `Number3` to
+     *           divide.
+     */
+     public div(xyz: number | Number2 | Number3) {
+        if(xyz instanceof Number2) {
+            this.x /= xyz.x;
+            this.y /= xyz.y;
+        } else if(xyz instanceof Number3) {
+            this.x /= xyz.x;
+            this.y /= xyz.y;
+            this.z /= xyz.z;
+        } else {
+            this.x /= xyz;
+            this.y /= xyz;
+            this.z /= xyz;
+        }
+
+        return this;
+    }
+
+    /**
+     * Make a copy of the current vector.
+     * @returns The copy of the vector.
+     */
+     public copy() {
+        return new Number3(this.x, this.y, this.z);
+    }
+
+    /**
+     * Get normalized copy of this vector.
+     * @returns Normalized vector.
+     */
+    public normalize() {
+        return this.copy().div(Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z));
+    }
 }
