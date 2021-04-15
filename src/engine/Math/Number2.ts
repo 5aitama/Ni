@@ -1,10 +1,11 @@
+import IMathComponent from "./IMathComponent";
 
 /**
  * Class that group two number together and allow you to
  * perform some operation on it. Usefull for things like
- * `2D Vector` representation.
+ * `2D Vector`.
  */
-export default class Number2 {
+export default class Number2 implements IMathComponent {
 
     x: number = 0;
     y: number = 0;
@@ -24,6 +25,10 @@ export default class Number2 {
             this.x = x;
             this.y = y;
         }
+    }
+
+    public rawData() {
+        return [this.x, this.y];
     }
 
     /**
@@ -78,5 +83,36 @@ export default class Number2 {
         }
 
         return this;
+    }
+
+    /**
+     * Perform a basic division on each vector property.
+     * 
+     * @param xy A `number` or another `Number2` to divide.
+     */
+    public div(xy: number | Number2) {
+        if(xy instanceof Number2) {
+            this.x /= xy.x;
+            this.y /= xy.y;
+        } else {
+            this.x /= xy;
+            this.y /= xy;
+        }
+    }
+
+    /**
+     * Make a copy of the current vector.
+     * @returns The copy of the vector.
+     */
+    public copy() {
+        return new Number2(this.x, this.y);
+    }
+
+    /**
+     * Get normalized copy of this vector.
+     * @returns Normalized vector.
+     */
+    public normalize() {
+        return this.copy().div(Math.sqrt(this.x * this.x + this.y * this.y));
     }
 }

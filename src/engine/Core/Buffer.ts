@@ -1,3 +1,6 @@
+import IMathComponent from "../Math/IMathComponent";
+import Number2 from "../Math/Number2";
+import Number3 from "../Math/Number3";
 import Shader from "./Shader";
 
 /**
@@ -25,7 +28,7 @@ export enum BufferDataTypeSize {
 /**
  * Types that can be stored in a buffer.
  */
-export enum BufferDataType {
+export enum BufferAttributeDataType {
     /** signed 8-bit integer, with values in [-128, 127] */
     byte   = WebGLRenderingContext['BYTE'],
 
@@ -52,47 +55,33 @@ export enum BufferUsage {
     dynamic = WebGLRenderingContext['DYNAMIC_DRAW'],
 }
 
-export enum BufferAttributeAmount {
+export enum BufferAttributeSize {
     one     = 1,
     two     = 2,
     three   = 3,
     four    = 4,
 }
 
-// /**
-//  * Buffer data structure.
-//  */
-// type BufferData = {
-//     /** The data of the buffer. */
-//     data: number[],
-    
-//     /** Buffer data type */
-//     type: BufferDataType,
-
-//     /** The amount of attributes pers vertex. */
-//     size: BufferAttributeAmount,
-
-//     /** If the data must be normalized (`true`) or not (`false`) */
-//     normalized: boolean,
-// }
-
-export class BufferData {
+export class BufferAttribute {
     data: number[];
-    type: BufferDataType;
-    size: BufferAttributeAmount;
+    type: BufferAttributeDataType;
+    size: BufferAttributeSize;
     normalized: boolean;
 
-    constructor(data: number[], type: BufferDataType, size: BufferAttributeAmount, normalized: boolean) {
+    constructor(data: number[], type: BufferAttributeDataType, size: BufferAttributeSize, normalized: boolean) {
         this.data = data;
         this.type = type;
         this.size = size;
         this.normalized = normalized;
     }
+
+    public static readonly VertexAttributeName   = "vertices";
+    public static readonly IndexAttributeName    = "indices";
 }
 
 export default class Buffer {
 
-    public  data       : { [name: string]: BufferData };
+    public  attributes : { [name: string]: BufferAttribute };
     private target     : BufferTarget;
     private usage      : BufferUsage;
     private rawBuffer? : WebGLBuffer;
@@ -105,8 +94,8 @@ export default class Buffer {
      * @param target Buffer target.
      * @param usage Buffer usage.
      */
-    constructor(data: { [name: string]: BufferData }, target: BufferTarget, usage: BufferUsage) {
-        this.data       = data;
+    constructor(attributes: { [name: string]: BufferAttribute }, target: BufferTarget, usage: BufferUsage) {
+        this.attributes = attributes;
         this.target     = target;
         this.usage      = usage;
         this.needUpdate = false;
@@ -125,13 +114,13 @@ export default class Buffer {
      * @param dataType The buffer data type.
      * @returns The size (in byte) of specified data type.
      */
-    static sizeOfDataType(dataType: BufferDataType) {
+    static sizeOfDataType(dataType: BufferAttributeDataType) {
         switch(dataType) {
-            case BufferDataType.byte   : return BufferDataTypeSize.byte;
-            case BufferDataType.short  : return BufferDataTypeSize.short;
-            case BufferDataType.ubyte  : return BufferDataTypeSize.ubyte;
-            case BufferDataType.ushort : return BufferDataTypeSize.ushort;
-            case BufferDataType.float  : return BufferDataTypeSize.float;
+            case BufferAttributeDataType.byte   : return BufferDataTypeSize.byte;
+            case BufferAttributeDataType.short  : return BufferDataTypeSize.short;
+            case BufferAttributeDataType.ubyte  : return BufferDataTypeSize.ubyte;
+            case BufferAttributeDataType.ushort : return BufferDataTypeSize.ushort;
+            case BufferAttributeDataType.float  : return BufferDataTypeSize.float;
             default: throw new Error(`Missing size for data type "${dataType}"`);
         }
     }
@@ -144,10 +133,25 @@ export default class Buffer {
      static strideOf<T extends Buffer>(buffer: T) {
         let stride = 0;
 
-        for(const key in buffer.data)
-            stride += this.sizeOfDataType(buffer.data[key].type) * buffer.data[key].size;
+        for(const key in buffer.attributes)
+            stride += this.sizeOfDataType(buffer.attributes[key].type) * buffer.attributes[key].size;
 
         return stride;
+    }
+
+    /**
+     * Flat an array of object that implement `IMathComponent`.
+     * 
+     * @param data The array of element to be flatten.
+     * @returns The flatten array.
+     */
+     public static flat<T extends IMathComponent>(vectors: T[]) {
+        const array: number[] = [];
+
+        for(const vector of vectors)
+            array.push(...vector.rawData());
+
+        return array;
     }
 
     /**
@@ -183,8 +187,8 @@ export default class Buffer {
             let bufferSize = 0;
 
             // Get the size of the buffer.
-            for(const key in buffer.data)
-                bufferSize += buffer.data[key].data.length * this.sizeOfDataType(buffer.data[key].type);
+            for(const key in buffer.attributes)
+                bufferSize += buffer.attributes[key].data.length * this.sizeOfDataType(buffer.attributes[key].type);
             
             this.bindBuffer(gl, buffer);
             gl.bufferData(buffer.target, bufferSize, buffer.usage);
@@ -210,19 +214,19 @@ export default class Buffer {
         this.bindBuffer(gl, buffer);
 
         // Get the stride of the buffer...
-        for(const key in buffer.data)
-            stride += this.sizeOfDataType(buffer.data[key].type) * buffer.data[key].size;
+        for(const key in buffer.attributes)
+            stride += this.sizeOfDataType(buffer.attributes[key].type) * buffer.attributes[key].size;
 
-        for(const key in buffer.data) {
+        for(const key in buffer.attributes) {
             let bufferdata : BufferSource | undefined;
 
             // Create an array according to the buffer data type.
-            switch(buffer.data[key].type) {
-                case BufferDataType.byte   : bufferdata = new Int8Array    (buffer.data[key].data); break;
-                case BufferDataType.float  : bufferdata = new Float32Array (buffer.data[key].data); break;
-                case BufferDataType.short  : bufferdata = new Int16Array   (buffer.data[key].data); break;
-                case BufferDataType.ubyte  : bufferdata = new Uint8Array   (buffer.data[key].data); break;
-                case BufferDataType.ushort : bufferdata = new Uint16Array  (buffer.data[key].data); break;
+            switch(buffer.attributes[key].type) {
+                case BufferAttributeDataType.byte   : bufferdata = new Int8Array    (buffer.attributes[key].data); break;
+                case BufferAttributeDataType.float  : bufferdata = new Float32Array (buffer.attributes[key].data); break;
+                case BufferAttributeDataType.short  : bufferdata = new Int16Array   (buffer.attributes[key].data); break;
+                case BufferAttributeDataType.ubyte  : bufferdata = new Uint8Array   (buffer.attributes[key].data); break;
+                case BufferAttributeDataType.ushort : bufferdata = new Uint16Array  (buffer.attributes[key].data); break;
             }
             
             if(bufferdata) {
@@ -237,7 +241,7 @@ export default class Buffer {
                     const location = gl.getAttribLocation(shader.program!, key);
 
                     // Describe the vertex attribute data layout...
-                    gl.vertexAttribPointer(location, buffer.data[key].size, buffer.data[key].type, buffer.data[key].normalized, stride, vaOffset);
+                    gl.vertexAttribPointer(location, buffer.attributes[key].size, buffer.attributes[key].type, buffer.attributes[key].normalized, stride, vaOffset);
                     
                     // Don't forget to enable the vertex array.
                     gl.enableVertexAttribArray(location);
@@ -248,10 +252,10 @@ export default class Buffer {
             }
             
             // Get the size (in byte) of the data type
-            const dataTypeSize = this.sizeOfDataType(buffer.data[key].type);
+            const dataTypeSize = this.sizeOfDataType(buffer.attributes[key].type);
 
-            offset   += buffer.data[key].data.length * dataTypeSize;
-            vaOffset += buffer.data[key].size * this.sizeOfDataType(buffer.data[key].type);
+            offset   += buffer.attributes[key].data.length * dataTypeSize;
+            vaOffset += buffer.attributes[key].size * this.sizeOfDataType(buffer.attributes[key].type);
         }
     }
 }
