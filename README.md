@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="300" src="./img/Ni_Logo.png">
+  <img width="300" src="./img/logo.png">
 </p>
 
 ## Description
