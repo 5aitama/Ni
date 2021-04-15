@@ -8,9 +8,7 @@ export default class MeshBase {
      */
     buffers: {[key: string]: Buffer} = {};
 
-    constructor() {
-        
-    }
+    constructor() { }
 
     /**
      * Add a buffer.

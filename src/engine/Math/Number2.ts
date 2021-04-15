@@ -84,4 +84,35 @@ export default class Number2 implements IMathComponent {
 
         return this;
     }
+
+    /**
+     * Perform a basic division on each vector property.
+     * 
+     * @param xy A `number` or another `Number2` to divide.
+     */
+    public div(xy: number | Number2) {
+        if(xy instanceof Number2) {
+            this.x /= xy.x;
+            this.y /= xy.y;
+        } else {
+            this.x /= xy;
+            this.y /= xy;
+        }
+    }
+
+    /**
+     * Make a copy of the current vector.
+     * @returns The copy of the vector.
+     */
+    public copy() {
+        return new Number2(this.x, this.y);
+    }
+
+    /**
+     * Get normalized copy of this vector.
+     * @returns Normalized vector.
+     */
+    public normalize() {
+        return this.copy().div(Math.sqrt(this.x * this.x + this.y * this.y));
+    }
 }

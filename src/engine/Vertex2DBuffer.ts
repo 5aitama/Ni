@@ -1,4 +1,4 @@
-import {
+import Buffer, {
     BufferUsage,
     BufferTarget,
     BufferAttribute,
@@ -20,12 +20,7 @@ export default class Vertex2DBuffer extends VertexBuffer {
      * @param isDynamic Must be `true` if the buffer will be modified repeatedly and used many times.
      */
     constructor(data: Number2[], isDynamic: boolean) {
-        const array = [];
-
-        for(const n of data)
-            array.push(n.x, n.y);
-        
-        super({ aVertexPosition: new BufferAttribute(array, BufferAttributeDataType.short, BufferAttributeSize.two, false) }, isDynamic);
+        super({ vertices: new BufferAttribute(Buffer.flat(data), BufferAttributeDataType.short, BufferAttributeSize.two, false) }, isDynamic);
     }
 
 }

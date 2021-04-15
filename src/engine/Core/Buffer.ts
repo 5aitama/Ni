@@ -1,3 +1,6 @@
+import IMathComponent from "../Math/IMathComponent";
+import Number2 from "../Math/Number2";
+import Number3 from "../Math/Number3";
 import Shader from "./Shader";
 
 /**
@@ -71,6 +74,9 @@ export class BufferAttribute {
         this.size = size;
         this.normalized = normalized;
     }
+
+    public static readonly VertexAttributeName   = "vertices";
+    public static readonly IndexAttributeName    = "indices";
 }
 
 export default class Buffer {
@@ -131,6 +137,21 @@ export default class Buffer {
             stride += this.sizeOfDataType(buffer.attributes[key].type) * buffer.attributes[key].size;
 
         return stride;
+    }
+
+    /**
+     * Flat an array of object that implement `IMathComponent`.
+     * 
+     * @param data The array of element to be flatten.
+     * @returns The flatten array.
+     */
+     public static flat<T extends IMathComponent>(vectors: T[]) {
+        const array: number[] = [];
+
+        for(const vector of vectors)
+            array.push(...vector.rawData());
+
+        return array;
     }
 
     /**
