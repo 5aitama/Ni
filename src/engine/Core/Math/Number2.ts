@@ -98,6 +98,8 @@ export default class Number2 implements IMathComponent {
             this.x /= xy;
             this.y /= xy;
         }
+
+        return this;
     }
 
     /**

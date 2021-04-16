@@ -1,7 +1,12 @@
-import Number2 from "./Math/Number2";
-import Number3x3 from "./Math/Number3x3";
 
-export default class Transform2D {
+import Scene                        from "../Core/Genesis/Scene";
+import Number2                      from "../Core/Math/Number2";
+import Material, { Uniform, UniformType }    from "../Core/Genesis/Material";
+import Number3x3                    from "../Core/Math/Number3x3";
+import GameObjectBase               from "../Core/Base/GameObjectBase";
+import ComponentBase                from "../Core/Base/ComponentBase";
+
+export default class Transform2D extends ComponentBase {
 
     /** The world position in 2D space */
     private position: Number2;
@@ -25,12 +30,24 @@ export default class Transform2D {
      * @param scale The scale.
      */
     constructor(position: Number2 = new Number2(0), rotation: number = 0, scale: Number2 = new Number2(1)) {
+        super();
+
         this.position   = position;
         this.scale      = scale;
         this.rotation   = rotation;
 
         this.modelMatrix = new Number3x3(Number3x3.identity())
         this.recalculateModelMatrix();
+    }
+
+    onUpdate(_: Scene, gameObject: GameObjectBase) {
+        if(this.needRecalculateMatrix) {
+            this.recalculateModelMatrix();
+        }
+        
+        if(gameObject.haveComponent(Material)) {
+            gameObject.getComponent(Material)!.setUniform('m_mat', new Uniform(this.modelMatrix.data, UniformType.Float3x3Array));
+        }
     }
 
     /**
@@ -103,7 +120,7 @@ export default class Transform2D {
         const r = Number3x3.rMatrix(this.rotation);
         const s = Number3x3.sMatrix(this.scale);
 
-        this.modelMatrix = Number3x3.mul(t, Number3x3.mul(r, s)) as Number3x3;
+        this.modelMatrix = Number3x3.mul(s, Number3x3.mul(r, t)) as Number3x3;
         this.needRecalculateMatrix = false;
     }
 }

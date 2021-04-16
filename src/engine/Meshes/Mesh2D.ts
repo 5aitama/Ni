@@ -1,9 +1,9 @@
-import Buffer, { BufferAttribute } from "./Core/Buffer";
-import IndexBuffer from "./IndexBuffer";
-import Number2 from "./Math/Number2";
-import Number3 from "./Math/Number3";
+import Buffer, { BufferAttribute } from "../Core/Genesis/Buffer";
+import IndexBuffer from "../Buffers/IndexBuffer";
+import Number2 from "../Core/Math/Number2";
+import Number3 from "../Core/Math/Number3";
 import MeshBase from "./MeshBase";
-import Vertex2DBuffer from "./Vertex2DBuffer";
+import Vertex2DBuffer from "../Buffers/Vertex2DBuffer";
 
 export default class Mesh2D extends MeshBase {
 

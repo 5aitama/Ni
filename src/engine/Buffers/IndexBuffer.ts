@@ -4,7 +4,7 @@ import Buffer, {
     BufferAttribute,
     BufferAttributeSize,
     BufferAttributeDataType,
-} from "./Core/Buffer";
+} from "../Core/Genesis/Buffer";
 
 /**
  * Index buffer.

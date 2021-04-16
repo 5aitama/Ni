@@ -1,6 +1,11 @@
-import Buffer from "./Core/Buffer";
+import Buffer from "../Core/Genesis/Buffer";
+import ComponentBase from "../Core/Base/ComponentBase";
+import Material from "../Core/Genesis/Material";
+import Scene from "../Core/Genesis/Scene";
+import Shader from "../Core/Genesis/Shader";
+import GameObjectBase from "../Core/Base/GameObjectBase";
 
-export default class MeshBase {
+export default class MeshBase extends ComponentBase {
     
     /**
      * Dictionary that contains
@@ -8,7 +13,41 @@ export default class MeshBase {
      */
     buffers: {[key: string]: Buffer} = {};
 
-    constructor() { }
+    shader?: Shader;
+
+    constructor() {
+        super();
+    }
+
+    onRender(scene: Scene, gameObject: GameObjectBase) {
+        const gl = scene.getContext();
+
+        if(!this.shader)
+            this.shader = gameObject.getComponent(Material)?.getShader();
+
+        if(this.shader) {
+            for(const key in this.buffers) {
+                Buffer.updateBuffer(gl, this.buffers[key], this.shader);
+                Buffer.bindBuffer(gl, this.buffers[key]);
+            }
+        }
+
+
+        const iBuffer = this.getBuffer('index_buffer');
+
+        if(iBuffer) {
+            const indicesAttr = iBuffer.attributes['indices'];
+            gl.drawElements(gl.TRIANGLES, indicesAttr.data.length, indicesAttr.type, 0);
+        }
+    }
+
+    onDestroy(scene: Scene, gameObject: GameObjectBase) {
+        const gl = scene.getContext();
+
+        for(const key in this.buffers) {
+            Buffer.deleteBuffer(gl, this.buffers[key]);
+        }
+    }
 
     /**
      * Add a buffer.

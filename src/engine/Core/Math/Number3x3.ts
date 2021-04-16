@@ -75,9 +75,9 @@ export default class Number3x3 implements IMathComponent, IMatrix<Number2, numbe
      */
     public static tMatrix(translation: Number2) {
         return new Number3x3([
-            1, 0, translation.x,
-            0, 1, translation.y,
-            0, 0, 1            ,
+            1            ,             0, 0,
+            0            ,             1, 0,
+            translation.x, translation.y, 1,
         ]);
     }
     
@@ -94,10 +94,13 @@ export default class Number3x3 implements IMathComponent, IMatrix<Number2, numbe
      * @param by rotation angle in radian.
      */
     public rotate(by: number): void {
+        const c = Math.cos(by);
+        const s = Math.sin(by);
+
         const rMatrix = new Number3x3([
-             Math.cos(by), Math.sin(by), 0,
-            -Math.sin(by), Math.cos(by), 0,
-             0           , 0           , 1,
+            c, -s,  0,
+            s,  c,  0,
+            0,  0,  1,
         ]);
 
         this.data = Number3x3.mul(this, rMatrix).rawData();
@@ -148,6 +151,17 @@ export default class Number3x3 implements IMathComponent, IMatrix<Number2, numbe
             0, 1, 0, 
             0, 0, 1,
         ];
+    }
+
+    public static projection(size: Number2) {
+        const w =  2 / size.x;
+        const h = -2 / size.y;
+        
+        return [
+             w, 0, 0,
+             0, h, 0,
+            -1, 1, 1,
+        ]
     }
 
     /**

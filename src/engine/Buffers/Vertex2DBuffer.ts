@@ -4,9 +4,9 @@ import Buffer, {
     BufferAttribute,
     BufferAttributeSize,
     BufferAttributeDataType,
-} from "./Core/Buffer";
+} from "../Core/Genesis/Buffer";
 
-import Number2 from "./Math/Number2";
+import Number2 from "../Core/Math/Number2";
 import VertexBuffer from "./VertexBuffer";
 
 /**
@@ -20,7 +20,7 @@ export default class Vertex2DBuffer extends VertexBuffer {
      * @param isDynamic Must be `true` if the buffer will be modified repeatedly and used many times.
      */
     constructor(data: Number2[], isDynamic: boolean) {
-        super({ vertices: new BufferAttribute(Buffer.flat(data), BufferAttributeDataType.short, BufferAttributeSize.two, false) }, isDynamic);
+        super({ vertex: new BufferAttribute(Buffer.flat(data), BufferAttributeDataType.float, BufferAttributeSize.two, false) }, isDynamic);
     }
 
 }

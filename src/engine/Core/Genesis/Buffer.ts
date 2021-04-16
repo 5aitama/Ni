@@ -46,12 +46,18 @@ export enum BufferAttributeDataType {
 }
 
 export enum BufferTarget {
+    /** An array buffer */
     array   = WebGLRenderingContext['ARRAY_BUFFER'],
+
+    /** An array element buffer */
     element = WebGLRenderingContext['ELEMENT_ARRAY_BUFFER'],
 }
 
 export enum BufferUsage {
+    /** Static draw */
     static  = WebGLRenderingContext['STATIC_DRAW'],
+
+    /** Dynamic draw */
     dynamic = WebGLRenderingContext['DYNAMIC_DRAW'],
 }
 
@@ -165,6 +171,11 @@ export default class Buffer {
         gl.bindBuffer(buffer.target, buffer.rawBuffer);
     }
 
+    static deleteBuffer(gl: WebGLRenderingContext, buffer: Buffer) {
+        gl.deleteBuffer(buffer.rawBuffer ?? null);
+        buffer.rawBuffer = undefined;
+    }
+
     /**
      * Update a buffer. If the buffer was not initialized
      * it send data to it otherwise it update the data.
@@ -172,8 +183,6 @@ export default class Buffer {
      * @param buffer The buffer to be updated
      */
     static updateBuffer(gl: WebGLRenderingContext, buffer: Buffer, shader: Shader) {
-        if(!shader.isCompiled)
-            throw "Can't update buffer: Shader must be compiled!";
 
         // Init the buffer if it was not initialized.
         if(buffer.rawBuffer == null) {
@@ -218,6 +227,7 @@ export default class Buffer {
             stride += this.sizeOfDataType(buffer.attributes[key].type) * buffer.attributes[key].size;
 
         for(const key in buffer.attributes) {
+
             let bufferdata : BufferSource | undefined;
 
             // Create an array according to the buffer data type.

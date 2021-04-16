@@ -1,4 +1,8 @@
+import GameObjectBase from "../Base/GameObjectBase";
+import ComponentBase from "../Base/ComponentBase";
+import Scene from "./Scene";
 import Shader from "./Shader";
+import { SDictionaryOf } from "./Dictionary";
 
 export enum UniformType {
     Float,
@@ -38,10 +42,17 @@ export enum AttributeType {
     Float4Array,
 }
 
-export type Uniform = {
-    type      : UniformType,
-    data      : number[],
-    transpose : boolean,
+export class Uniform {
+    
+    type      : UniformType;
+    data      : number[];
+    transpose : boolean;
+
+    constructor(data: number[], type: UniformType, transpose: boolean = false) {
+        this.data       = data;
+        this.type       = type;
+        this.transpose  = transpose;
+    }
 }
 
 export type Attribute = {
@@ -49,26 +60,91 @@ export type Attribute = {
     data      : number[],
 }
 
-export default class Material {
-    shader      : Shader;
-    attributes  : {[name: string]: Attribute};
-    uniforms    : {[name: string]: Uniform};
+export default class Material extends ComponentBase {
 
-    constructor(shader: Shader, attributes: {[name: string]: Attribute}, uniforms: {[name: string]: Uniform}) {
+    private shader      : Shader;
+    private attributes  : SDictionaryOf<Attribute>;
+    private uniforms    : SDictionaryOf<Uniform>;
+
+    constructor(shader: Shader, attributes: {[name: string]: Attribute} = {}, uniforms: {[name: string]: Uniform} = {}) {
+        super();
+
         this.attributes = attributes;
         this.uniforms   = uniforms;
         this.shader     = shader;
     }
 
-    sendAttributes(gl: WebGLRenderingContext) {
-        if(!this.shader.isCompiled)
-            this.shader.compile(gl);
+    onInit(scene: Scene, _: GameObjectBase) {
+        this.shader.compile(scene.getContext());
+    }
 
+    onBeforeRender(scene: Scene, _: GameObjectBase) {
         if(this.shader.program === undefined)
-            throw new Error("Failed to send attributes: shader program was undefined.")
+            throw new Error("Failed to send shader uniforms & attributes : shader program was undefined.");
+        
+        const gl = scene.getContext();
 
         gl.useProgram(this.shader.program);
 
+        this.sendAttributes(gl);
+        this.sendUniforms(gl);
+    }
+
+    /**
+     * Get the shader.
+     * @returns The shader.
+     */
+    public getShader() {
+        return this.shader;
+    }
+
+    /**
+     * Set an attribute.
+     * @param name The attribute name.
+     * @param attribute The attibute data.
+     */
+    public setAttribute(name: string, attribute: Attribute) {
+        this.attributes[name] = attribute;
+    }
+
+    /**
+     * Remove an attribute.
+     * @param name The attribute name.
+     * @returns `true` if the attribute was successfuly removed otherwise `false`
+     */
+    public removeAttribute(name: string) {
+        if(this.attributes[name]) {
+            delete this.attributes[name];
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Set an uniform.
+     * @param name The uniform name.
+     * @param uniform The uniform data.
+     */
+     public setUniform(name: string, uniform: Uniform) {
+        this.uniforms[name] = uniform;
+    }
+
+    /**
+     * Remove an uniform.
+     * @param name The uniform name.
+     * @returns `true` if the uniform was successfuly removed otherwise `false`
+     */
+    public removeUniform(name: string) {
+        if(this.uniforms[name]) {
+            delete this.uniforms[name];
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private sendAttributes(gl: WebGLRenderingContext) {
         // Send attribute data to the shader.
         for(const key in this.attributes) {
 
@@ -76,7 +152,7 @@ export default class Material {
             const attribute = this.attributes[key];
 
             // The attribute location in the vertex shader.
-            const location = gl.getAttribLocation(this.shader.program, key);
+            const location = gl.getAttribLocation(this.shader.program!, key);
 
             switch(attribute.type) {
                 case AttributeType.FloatArray: 
@@ -111,14 +187,7 @@ export default class Material {
         }
     }
 
-    sendUniforms(gl: WebGLRenderingContext) {
-        if(!this.shader.isCompiled)
-            this.shader.compile(gl);
-
-        if(this.shader.program === undefined)
-            throw new Error("Failed to send uniforms: shader program was undefined.")
-
-        gl.useProgram(this.shader.program);
+    private sendUniforms(gl: WebGLRenderingContext) {
 
         // Send uniform data to the shader.
         for(const key in this.uniforms) {
@@ -127,7 +196,7 @@ export default class Material {
             const uniform = this.uniforms[key];
 
             // The uniform location in the fragment shader.
-            const location = gl.getUniformLocation(this.shader.program, key);
+            const location = gl.getUniformLocation(this.shader.program!, key);
 
             switch(uniform.type) {
                 case UniformType.FloatArray: 

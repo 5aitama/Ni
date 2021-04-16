@@ -2,7 +2,7 @@ import Buffer, {
     BufferAttribute,
     BufferTarget,
     BufferUsage,
-} from "./Core/Buffer";
+} from "../Core/Genesis/Buffer";
 
 export default class VertexBuffer extends Buffer {
 
