@@ -1,8 +1,9 @@
-import GameObjectBase from "../Base/GameObjectBase";
-import ComponentBase from "../Base/ComponentBase";
-import Scene from "./Scene";
-import Shader from "./Shader";
 import { SDictionaryOf } from "./Dictionary";
+import GameObjectBase   from "../Base/GameObjectBase";
+import ComponentBase    from "../Base/ComponentBase";
+import Scene            from "./Scene";
+import Shader           from "./Shader";
+import IComponent from "../Math/components/IComponent";
 
 export enum UniformType {
     Float,
@@ -48,8 +49,8 @@ export class Uniform {
     data      : number[];
     transpose : boolean;
 
-    constructor(data: number[], type: UniformType, transpose: boolean = false) {
-        this.data       = data;
+    constructor(data: number[] | number | IComponent, type: UniformType, transpose: boolean = false) {
+        this.data       = Array.isArray(data) ? data : typeof data === 'number' ? [ data ] : data.flat();
         this.type       = type;
         this.transpose  = transpose;
     }

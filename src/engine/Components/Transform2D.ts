@@ -1,10 +1,11 @@
 
 import Scene                        from "../Core/Genesis/Scene";
-import Number2                      from "../Core/Math/Number2";
+import Number2                      from "../Core/Math/components/Number2";
 import Material, { Uniform, UniformType }    from "../Core/Genesis/Material";
-import Number3x3                    from "../Core/Math/Number3x3";
+import Mat3x3                    from "../Core/Math/components/Mat3x3";
 import GameObjectBase               from "../Core/Base/GameObjectBase";
 import ComponentBase                from "../Core/Base/ComponentBase";
+import Number3 from "../Core/Math/components/Number3";
 
 export default class Transform2D extends ComponentBase {
 
@@ -18,7 +19,7 @@ export default class Transform2D extends ComponentBase {
     private scale: Number2;
 
     /** The transform matrix. */
-    private modelMatrix: Number3x3;
+    private modelMatrix: Mat3x3<Number3>;
 
     /** Indicate if the matrix need to be recalculate. */
     private needRecalculateMatrix: boolean = true;
@@ -36,7 +37,7 @@ export default class Transform2D extends ComponentBase {
         this.scale      = scale;
         this.rotation   = rotation;
 
-        this.modelMatrix = new Number3x3(Number3x3.identity())
+        this.modelMatrix = new Mat3x3(Mat3x3.identity())
         this.recalculateModelMatrix();
     }
 
@@ -46,7 +47,7 @@ export default class Transform2D extends ComponentBase {
         }
         
         if(gameObject.haveComponent(Material)) {
-            gameObject.getComponent(Material)!.setUniform('m_mat', new Uniform(this.modelMatrix.data, UniformType.Float3x3Array));
+            gameObject.getComponent(Material)!.setUniform('m_mat', new Uniform(this.modelMatrix.flat(), UniformType.Float3x3Array));
         }
     }
 
@@ -116,11 +117,11 @@ export default class Transform2D extends ComponentBase {
      * Recalculate the current model matrix.
      */
     private recalculateModelMatrix() {
-        const t = Number3x3.tMatrix(this.position);
-        const r = Number3x3.rMatrix(this.rotation);
-        const s = Number3x3.sMatrix(this.scale);
-
-        this.modelMatrix = Number3x3.mul(s, Number3x3.mul(r, t)) as Number3x3;
+        const t = Mat3x3.tMatrix(this.position);
+        const r = Mat3x3.rMatrix(this.rotation);
+        const s = Mat3x3.sMatrix(this.scale);
+        
+        this.modelMatrix = s.mul(r.mul(t)) as Mat3x3<Number3>;
         this.needRecalculateMatrix = false;
     }
 }

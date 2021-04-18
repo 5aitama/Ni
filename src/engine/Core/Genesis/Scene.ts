@@ -1,6 +1,7 @@
-import GameObjectBase from "../Base/GameObjectBase";
-import Number2 from "../Math/Number2";
-import { SDictionaryOf } from "./Dictionary";
+import GameObjectBase       from "../Base/GameObjectBase";
+import Number2              from "../Math/components/Number2";
+import { ushort2 }          from "../Math/components/Vec2";
+import { SDictionaryOf }    from "./Dictionary";
 
 /**
  *  2D Scene.
@@ -9,6 +10,9 @@ export default class Scene {
     private gl              : WebGLRenderingContext;
     private gameObjects     : SDictionaryOf<GameObjectBase> = {};
     protected mousePosition : Number2 = new Number2(0);
+    protected time          : number = 0;
+    protected deltaTime     : number = 0;
+    private lastTime        : number = 0;
 
     constructor(canvas: HTMLCanvasElement) {
         const gl = canvas.getContext('webgl');
@@ -31,8 +35,8 @@ export default class Scene {
     }
 
     private onMouseMove(ev: MouseEvent) {
-        this.mousePosition.x = ev.clientX;
-        this.mousePosition.y = ev.clientY;
+        this.mousePosition.x = ev.clientX * devicePixelRatio;
+        this.mousePosition.y = ev.clientY * devicePixelRatio;
     }
 
     public getContext() {
@@ -60,7 +64,7 @@ export default class Scene {
             this.gameObjects[key].onInit(this);
     }
 
-    protected async onUpdate(time: number) {
+    protected async onUpdate() {
         for(const key in this.gameObjects)
             this.gameObjects[key].onUpdate(this);
     }
@@ -91,7 +95,7 @@ export default class Scene {
     }
 
     getSize() {
-        return new Number2(this.gl.canvas.width, this.gl.canvas.height);
+        return new ushort2(this.gl.canvas.width, this.gl.canvas.height);
     }
 
     addGameObject(name: string, gameObject: GameObjectBase) {
@@ -127,7 +131,11 @@ export default class Scene {
     }
 
     public async loopScene(time = 0) {
-        await this.onUpdate(time);
+        this.time       = time;
+        this.deltaTime  = this.time - this.lastTime;
+        this.lastTime   = this.time;
+
+        await this.onUpdate();
         this.onBeforeRender();
         this.onRender();
         this.onAfterRender();

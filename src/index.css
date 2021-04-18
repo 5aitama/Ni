@@ -23,6 +23,7 @@ h1 {
     font-size: 5rem;
 
     user-select: none;
+    -webkit-user-select: none;
 }
 
 #changescene {

@@ -1,5 +1,5 @@
 import Mesh2D           from "../Meshes/Mesh2D";
-import Number2          from "../Core/Math/Number2";
+import Number2          from "../Core/Math/components/Number2";
 import Material         from "../Core/Genesis/Material";
 import Transform2D      from "../Components/Transform2D";
 import GameObjectBase   from "../Core/Base/GameObjectBase";
