@@ -8,9 +8,11 @@ export default class GameObjectBase {
      * Dictionary of all components that 
      * be owned by this the current gameobject.
      */
-    public components: SDictionaryOf<ComponentBase> = {};
+    public components: SDictionaryOf<ComponentBase>;
 
-    constructor() { }
+    constructor(components?: SDictionaryOf<ComponentBase>) {
+        this.components = components ? components : {};
+    }
 
     public onInit(scene: Scene) {
         for(const componentKey in this.components)
