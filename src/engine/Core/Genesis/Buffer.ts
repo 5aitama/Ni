@@ -1,7 +1,5 @@
-import IMathComponent from "../Math/IMathComponent";
-import Number2 from "../Math/Number2";
-import Number3 from "../Math/Number3";
-import Shader from "./Shader";
+import IComponent   from "../Math/components/IComponent";
+import Shader       from "./Shader";
 
 /**
  * The size of each buffer data type
@@ -151,11 +149,11 @@ export default class Buffer {
      * @param data The array of element to be flatten.
      * @returns The flatten array.
      */
-     public static flat<T extends IMathComponent>(vectors: T[]) {
+    public static flat2<T extends IComponent>(vectors: T[]) {
         const array: number[] = [];
 
         for(const vector of vectors)
-            array.push(...vector.rawData());
+            array.push(...vector.flat());
 
         return array;
     }

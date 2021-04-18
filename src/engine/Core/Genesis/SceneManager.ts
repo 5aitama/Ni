@@ -1,4 +1,3 @@
-import { SDictionaryOf } from "./Dictionary";
 import Scene from "./Scene";
 
 
